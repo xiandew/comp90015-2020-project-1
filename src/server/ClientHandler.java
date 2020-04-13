@@ -7,30 +7,32 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.HashMap;
 
-import server.DictionaryController.PartOfSpeech;
+import utils.PartOfSpeech;
 
 public class ClientHandler implements Runnable {
 
 	private static DictionaryController dictionaryController;
-	private Socket clientSockete;
+	private Socket clientSocket;
 	private DataInputStream dataInputStream;
 	private DataOutputStream dataOutputStream;
 
-	public ClientHandler(Socket clientSocket) throws Exception {
-		this.clientSockete = clientSocket;
+	public ClientHandler(Socket clientSocket) {
+		this.clientSocket = clientSocket;
 		try {
 			this.dataInputStream = new DataInputStream(clientSocket.getInputStream());
 			this.dataOutputStream = new DataOutputStream(clientSocket.getOutputStream());
 		} catch (IOException e) {
-			throw new Exception("Error: Unable to get DataInputStream/DataOutputStream");
+			e.printStackTrace();
+			return;
 		}
 	}
 
 	public static void setupDictionaryController(String dictionaryFilePath) throws Exception {
 		try {
-			dictionaryController = DictionaryController.getInstance(dictionaryFilePath);
+			dictionaryController = new DictionaryController(dictionaryFilePath);
 		} catch (Exception e) {
 			throw e;
 		}
@@ -42,6 +44,8 @@ public class ClientHandler implements Runnable {
 		while (true) {
 			try {
 				request = this.dataInputStream.readUTF();
+				this.dataOutputStream.writeUTF("Received");
+				System.out.println(request);
 //                if(received.equals("Exit")) {  
 //                    System.out.println("Client " + this.s + " sends exit..."); 
 //                    System.out.println("Closing this connection."); 
@@ -70,19 +74,19 @@ public class ClientHandler implements Runnable {
 //                    default: 
 //                        dos.writeUTF("Invalid input"); 
 //                        break; 
-//                } 
-				break;
+//                }
 			} catch (IOException e) {
-				e.printStackTrace();
+				System.out.print(e);
+				return;
 			}
 		}
 
-		try {
-			// closing resources
-			this.dataInputStream.close();
-			this.dataOutputStream.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+//		try {
+//			// closing resources
+//			this.dataInputStream.close();
+//			this.dataOutputStream.close();
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
 	}
 }
