@@ -10,6 +10,7 @@ import java.util.HashMap;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.json.JSONTokener;
 
 import utils.PartOfSpeech;
 
@@ -25,7 +26,7 @@ public class DictionaryController {
 		this.dictionary = new HashMap<String, HashMap<PartOfSpeech, String>>();
 
 		try {
-			for (Object wordObject : new JSONArray(new FileReader(dictionaryFilePath))) {
+			for (Object wordObject : new JSONArray(new JSONTokener(new FileReader(dictionaryFilePath)))) {
 				JSONObject wordJSONObject = (JSONObject) wordObject;
 				String word = (String) wordJSONObject.get("word");
 				HashMap<PartOfSpeech, String> definitions = new HashMap<>();
@@ -43,6 +44,7 @@ public class DictionaryController {
 		} catch (FileNotFoundException e) {
 			throw new Exception(String.format("Error: Dictionary file \"%s\" not found", dictionaryFilePath));
 		} catch (JSONException e) {
+			e.printStackTrace();
 			throw new Exception("Error: Parse error when parsing the dictionary file");
 		} catch (Exception e) {
 			e.printStackTrace();
