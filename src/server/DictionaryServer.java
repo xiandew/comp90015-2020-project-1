@@ -91,9 +91,13 @@ public class DictionaryServer {
 		Runtime.getRuntime().addShutdownHook(new Thread() {
 			public void run() {
 				try {
+					// Close all client sockets
 					ClientHandler.closeAllClientSockets();
+					// Close server socket
 					serverSocket.close();
-					System.out.println("Server stopped");
+					System.out.println("Server socket closed. Server stopped");
+					// Save dictionary onto disk
+					ClientHandler.saveDictionaryToDisk();
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
@@ -117,6 +121,7 @@ class DynamicBlockingQueue<E> extends LinkedBlockingQueue<E> {
 	@Override
 	public synchronized boolean offer(E e) {
 		if (this.executor != null && this.executor.getPoolSize() == this.executor.getMaximumPoolSize()) {
+			((ClientHandler) e).sendConnectionQueuedResponse();
 			return super.offer(e);
 		} else {
 			return false;

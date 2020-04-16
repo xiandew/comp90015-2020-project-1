@@ -5,6 +5,8 @@ package server;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 
 import org.json.JSONArray;
@@ -16,9 +18,11 @@ import utils.PartOfSpeech;
 
 public class DictionaryController {
 
+	private String dictionaryFilePath;
 	private HashMap<String, HashMap<PartOfSpeech, String>> dictionary;
 
 	public DictionaryController(String dictionaryFilePath) throws Exception {
+		this.dictionaryFilePath = dictionaryFilePath;
 		this.readDictionary(dictionaryFilePath);
 	}
 
@@ -100,5 +104,31 @@ public class DictionaryController {
 		}
 
 		return response;
+	}
+
+	public void saveToDisk() {
+		JSONArray dictionary = new JSONArray();
+		for (String word : this.dictionary.keySet()) {
+			JSONObject wordJSONObject = new JSONObject();
+			wordJSONObject.put("word", word);
+			JSONArray dfnJSONObjects = new JSONArray();
+			HashMap<PartOfSpeech, String> definitions = this.dictionary.get(word);
+			for (PartOfSpeech pos : definitions.keySet()) {
+				JSONObject dfnJSONObject = new JSONObject();
+				dfnJSONObject.put("pos", pos.name());
+				dfnJSONObject.put("description", definitions.get(pos));
+				dfnJSONObjects.put(dfnJSONObject);
+			}
+			wordJSONObject.put("definitions", dfnJSONObjects);
+			dictionary.put(wordJSONObject);
+		}
+
+		try (PrintWriter dictionaryPrintWtriter = new PrintWriter(this.dictionaryFilePath, "UTF-8");) {
+			dictionaryPrintWtriter.println(dictionary.toString(4));
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
 	}
 }
