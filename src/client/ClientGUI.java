@@ -156,6 +156,7 @@ public class ClientGUI {
 		panelQueryWordMeaning.add(scrollPaneWordMeaningOutput);
 
 		textAreaWordMeaningOutput = new JTextArea();
+		textAreaWordMeaningOutput.setWrapStyleWord(true);
 		scrollPaneWordMeaningOutput.setViewportView(textAreaWordMeaningOutput);
 		textAreaWordMeaningOutput.setEditable(false);
 		textAreaWordMeaningOutput.setFont(new Font("Courier New", Font.PLAIN, 15));
@@ -191,6 +192,7 @@ public class ClientGUI {
 		panelAddNewWord.add(lblEnterWordDefinition);
 
 		comboBoxSelectWordType = new JComboBox<PartOfSpeech>(PartOfSpeech.values());
+		comboBoxSelectWordType.setFont(new Font("Courier New", Font.PLAIN, 15));
 		comboBoxSelectWordType.setBounds(297, 76, 383, 24);
 		panelAddNewWord.add(comboBoxSelectWordType);
 
@@ -199,6 +201,8 @@ public class ClientGUI {
 		panelAddNewWord.add(scrollPaneEnterWordDefinition);
 
 		textAreaEnterWordDefinition = new JTextArea();
+		textAreaEnterWordDefinition.setWrapStyleWord(true);
+		textAreaEnterWordDefinition.setFont(new Font("Courier New", Font.PLAIN, 15));
 		scrollPaneEnterWordDefinition.setViewportView(textAreaEnterWordDefinition);
 		
 		JScrollPane scrollPaneAddingNewWordOutput = new JScrollPane();
@@ -206,6 +210,8 @@ public class ClientGUI {
 		panelAddNewWord.add(scrollPaneAddingNewWordOutput);
 
 		textAreaAddingNewWordOutput = new JTextArea();
+		textAreaAddingNewWordOutput.setWrapStyleWord(true);
+		textAreaAddingNewWordOutput.setFont(new Font("Courier New", Font.PLAIN, 15));
 		scrollPaneAddingNewWordOutput.setViewportView(textAreaAddingNewWordOutput);
 		
 		btnAddNewWord = new JButton("Add");
@@ -243,6 +249,7 @@ public class ClientGUI {
 		panelRemoveWord.add(scrollPaneRemoveWordOutput);
 
 		textAreaRemoveWordOutput = new JTextArea();
+		textAreaRemoveWordOutput.setWrapStyleWord(true);
 		scrollPaneRemoveWordOutput.setViewportView(textAreaRemoveWordOutput);
 		textAreaRemoveWordOutput.setFont(new Font("Courier New", Font.PLAIN, 15));
 		textAreaRemoveWordOutput.setEditable(false);
