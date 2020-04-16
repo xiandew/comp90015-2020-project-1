@@ -43,6 +43,10 @@ public class ClientHandler implements Runnable {
 			throw e;
 		}
 	}
+	
+	public static void saveDictionaryToDisk() {
+		ClientHandler.dictionaryController.saveToDisk();
+	}
 
 	public static void closeAllClientSockets() {
 		try {
@@ -50,6 +54,18 @@ public class ClientHandler implements Runnable {
 				socket.close();
 			}
 		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void sendConnectionQueuedResponse() {
+		HashMap<String, String> response = new HashMap<>();
+		response.put("type", MessageType.ResponseConnectionQueued.toString());
+		response.put("data", "System busy! Your requests will be queued. Please be patient");
+		// Send response
+		try {
+			this.dataOutputStream.writeUTF(new JSONObject(response).toString());
+		} catch (JSONException | IOException e) {
 			e.printStackTrace();
 		}
 	}
@@ -85,6 +101,9 @@ public class ClientHandler implements Runnable {
 				response.put("type", MessageType.ResponseAddingNewWord.toString());
 
 				JSONObject newWord = new JSONObject(request.get("data"));
+				
+				System.out.println(newWord.toString());
+				
 				String word = (String) newWord.get("word");
 				PartOfSpeech wordType = PartOfSpeech.valueOf((String) newWord.get("wordType"));
 				String description = (String) newWord.get("description");

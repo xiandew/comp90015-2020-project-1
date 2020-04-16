@@ -90,6 +90,10 @@ public class DictionaryClient {
 								window.textAreaRemoveWordOutput.setText((String) response.get("data"));
 								break;
 
+							case ResponseConnectionQueued:
+								window.showMessageDialog((String) response.get("data"));
+								break;
+
 							default:
 								System.out.println("Invalid message type");
 								break;

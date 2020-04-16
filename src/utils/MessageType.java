@@ -6,5 +6,6 @@ public enum MessageType {
 	RequestRemovingWord,
 	ResponseWordMeaning,
 	ResponseAddingNewWord,
-	ResponseRemovingWord
+	ResponseRemovingWord,
+	ResponseConnectionQueued
 }
