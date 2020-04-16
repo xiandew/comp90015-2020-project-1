@@ -18,6 +18,7 @@ public class ServerGUI {
 
 	private JFrame frmDictionaryServer;
 	public JTextField textFieldEnterPortNumber;
+	public JButton btnSelectDictFile;
 	public String selectedDictionaryFilePath = null;
 	public JButton btnStartServer;
 
@@ -62,7 +63,7 @@ public class ServerGUI {
 		lblSelectDictFile.setBounds(79, 139, 234, 18);
 		frmDictionaryServer.getContentPane().add(lblSelectDictFile);
 
-		JButton btnSelectDictFile = new JButton("Choose File...");
+		btnSelectDictFile = new JButton("Choose File...");
 		btnSelectDictFile.setFont(new Font("Courier New", Font.PLAIN, 15));
 		btnSelectDictFile.setBounds(370, 134, 244, 27);
 

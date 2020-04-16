@@ -59,6 +59,8 @@ public class DictionaryServer {
 
 							window.btnStartServer.setText("Server started");
 							window.btnStartServer.setEnabled(false);
+							window.textFieldEnterPortNumber.setEnabled(false);
+							window.btnSelectDictFile.setEnabled(false);
 
 							// Create new thread to prevent the GUI from being blocked by the while loop
 							new Thread(() -> {
