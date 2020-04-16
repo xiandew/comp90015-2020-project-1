@@ -7,9 +7,12 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
-import java.net.SocketException;
 import java.util.HashMap;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import utils.MessageType;
 import utils.PartOfSpeech;
 
 public class ClientHandler implements Runnable {
@@ -22,8 +25,8 @@ public class ClientHandler implements Runnable {
 	public ClientHandler(Socket clientSocket) {
 		this.clientSocket = clientSocket;
 		try {
-			this.dataInputStream = new DataInputStream(clientSocket.getInputStream());
-			this.dataOutputStream = new DataOutputStream(clientSocket.getOutputStream());
+			this.dataInputStream = new DataInputStream(this.clientSocket.getInputStream());
+			this.dataOutputStream = new DataOutputStream(this.clientSocket.getOutputStream());
 		} catch (IOException e) {
 			e.printStackTrace();
 			return;
@@ -40,53 +43,67 @@ public class ClientHandler implements Runnable {
 
 	@Override
 	public void run() {
-		String request;
+		JSONObject request;
+		HashMap<String, String> response = new HashMap<>();
 		while (true) {
 			try {
-				request = this.dataInputStream.readUTF();
-				this.dataOutputStream.writeUTF("Received");
-				System.out.println(request);
-//                if(received.equals("Exit")) {  
-//                    System.out.println("Client " + this.s + " sends exit..."); 
-//                    System.out.println("Closing this connection."); 
-//                    this.s.close(); 
-//                    System.out.println("Connection closed"); 
-//                    break; 
-//                } 
-
-				// creating Date object
-//                Date date = new Date(); 
-
-				// write on output stream based on the
-				// answer from the client
-//                switch (received) { 
-//                  
-//                    case "Date" : 
-//                        toreturn = fordate.format(date); 
-//                        dos.writeUTF(toreturn); 
-//                        break; 
-//                          
-//                    case "Time" : 
-//                        toreturn = fortime.format(date); 
-//                        dos.writeUTF(toreturn); 
-//                        break; 
-//                          
-//                    default: 
-//                        dos.writeUTF("Invalid input"); 
-//                        break; 
-//                }
+				request = new JSONObject(this.dataInputStream.readUTF());
+			} catch (JSONException e) {
+				e.printStackTrace();
+				break;
 			} catch (IOException e) {
-				System.out.print(e);
-				return;
+				e.printStackTrace();
+				break;
+			}
+			MessageType type = MessageType.valueOf((String) request.get("type"));
+
+			// Get response
+			switch (type) {
+			case RequestWordMeaning:
+
+				response = new HashMap<>();
+				response.put("type", MessageType.ResponseWordMeaning.toString());
+				response.put("data", ClientHandler.dictionaryController.queryWordMeaning((String) request.get("data")));
+
+			case RequestAddingNewWord:
+
+				response = new HashMap<>();
+				response.put("type", MessageType.ResponseAddingNewWord.toString());
+
+				JSONObject newWord = new JSONObject(request.get("data"));
+				String word = (String) newWord.get("word");
+				PartOfSpeech wordType = PartOfSpeech.valueOf((String) newWord.get("wordType"));
+				String description = (String) newWord.get("description");
+
+				response.put("data", ClientHandler.dictionaryController.addWord(word, wordType, description));
+
+			case RequestRemovingWord:
+
+				response = new HashMap<>();
+				response.put("type", MessageType.ResponseRemovingWord.toString());
+				response.put("data", ClientHandler.dictionaryController.removeWord((String) request.get("data")));
+
+			default:
+				System.out.println("Invalid message type");
+				break;
+			}
+
+			// Send response
+			try {
+				this.dataOutputStream.writeUTF(new JSONObject(response).toString());
+			} catch (JSONException | IOException e) {
+				e.printStackTrace();
+				break;
 			}
 		}
 
-//		try {
-//			// closing resources
-//			this.dataInputStream.close();
-//			this.dataOutputStream.close();
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
+		try {
+			// closing resources
+			this.clientSocket.close();
+			this.dataInputStream.close();
+			this.dataOutputStream.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 }
