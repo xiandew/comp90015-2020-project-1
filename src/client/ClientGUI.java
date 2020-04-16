@@ -118,18 +118,11 @@ public class ClientGUI {
 		// Main frame
 		frmDictionaryClient = new JFrame("My First Swing Example");
 		frmDictionaryClient.setTitle("Dictionary Client - COMP90015 Assignment 1, fall 2020");
-		// Setting the width and height of frame
 		frmDictionaryClient.setSize(764, 408);
 		frmDictionaryClient.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-		/*
-		 * Creating panel. This is same as a div tag in HTML We can create several
-		 * panels and add them to specific positions in a JFrame. Inside panels we can
-		 * add text fields, buttons and other components.
-		 */
 		panelWrapper = new JPanel();
 		panelWrapper.setLayout(null);
-		// adding panel to frame
 		frmDictionaryClient.getContentPane().add(panelWrapper, BorderLayout.CENTER);
 
 		ButtonGroup buttonGroupMenu = new ButtonGroup();
@@ -166,11 +159,6 @@ public class ClientGUI {
 		scrollPaneWordMeaningOutput.setViewportView(textAreaWordMeaningOutput);
 		textAreaWordMeaningOutput.setEditable(false);
 		textAreaWordMeaningOutput.setFont(new Font("Courier New", Font.PLAIN, 15));
-
-		btnAddNewWord = new JButton("Add");
-		btnAddNewWord.setBounds(586, 3, 96, 24);
-		panelQueryWordMeaning.add(btnAddNewWord);
-		btnAddNewWord.setFont(new Font("Courier New", Font.PLAIN, 15));
 
 		JPanel panelAddNewWord = new JPanel();
 		panelAddNewWord.setLayout(null);
@@ -219,6 +207,11 @@ public class ClientGUI {
 
 		textAreaAddingNewWordOutput = new JTextArea();
 		scrollPaneAddingNewWordOutput.setViewportView(textAreaAddingNewWordOutput);
+		
+		btnAddNewWord = new JButton("Add");
+		btnAddNewWord.setBounds(584, 258, 96, 24);
+		panelAddNewWord.add(btnAddNewWord);
+		btnAddNewWord.setFont(new Font("Courier New", Font.PLAIN, 15));
 
 		JPanel panelRemoveWord = new JPanel();
 		panelRemoveWord.setBounds(14, 35, 718, 264);
