@@ -7,6 +7,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.json.JSONException;
@@ -18,11 +19,13 @@ import utils.PartOfSpeech;
 public class ClientHandler implements Runnable {
 
 	private static DictionaryController dictionaryController;
+	private static ArrayList<Socket> clientSockets = new ArrayList<>();
 	private Socket clientSocket;
 	private DataInputStream dataInputStream;
 	private DataOutputStream dataOutputStream;
 
 	public ClientHandler(Socket clientSocket) {
+		ClientHandler.clientSockets.add(clientSocket);
 		this.clientSocket = clientSocket;
 		try {
 			this.dataInputStream = new DataInputStream(this.clientSocket.getInputStream());
@@ -41,18 +44,28 @@ public class ClientHandler implements Runnable {
 		}
 	}
 
+	public static void closeAllClientSockets() {
+		try {
+			for (Socket socket : ClientHandler.clientSockets) {
+				socket.close();
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
 	@Override
 	public void run() {
 		JSONObject request;
 		HashMap<String, String> response = new HashMap<>();
-		while (true) {
+		while (this.clientSocket.isConnected()) {
 			try {
 				request = new JSONObject(this.dataInputStream.readUTF());
 			} catch (JSONException e) {
 				e.printStackTrace();
 				break;
 			} catch (IOException e) {
-				e.printStackTrace();
+				// e.printStackTrace();
 				break;
 			}
 			MessageType type = MessageType.valueOf((String) request.get("type"));
@@ -64,6 +77,7 @@ public class ClientHandler implements Runnable {
 				response = new HashMap<>();
 				response.put("type", MessageType.ResponseWordMeaning.toString());
 				response.put("data", ClientHandler.dictionaryController.queryWordMeaning((String) request.get("data")));
+				break;
 
 			case RequestAddingNewWord:
 
@@ -76,12 +90,14 @@ public class ClientHandler implements Runnable {
 				String description = (String) newWord.get("description");
 
 				response.put("data", ClientHandler.dictionaryController.addWord(word, wordType, description));
+				break;
 
 			case RequestRemovingWord:
 
 				response = new HashMap<>();
 				response.put("type", MessageType.ResponseRemovingWord.toString());
 				response.put("data", ClientHandler.dictionaryController.removeWord((String) request.get("data")));
+				break;
 
 			default:
 				System.out.println("Invalid message type");
@@ -97,13 +113,6 @@ public class ClientHandler implements Runnable {
 			}
 		}
 
-		try {
-			// closing resources
-			this.clientSocket.close();
-			this.dataInputStream.close();
-			this.dataOutputStream.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		System.out.println("Client socket closed");
 	}
 }

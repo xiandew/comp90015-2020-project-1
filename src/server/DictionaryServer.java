@@ -57,7 +57,7 @@ public class DictionaryServer {
 								return;
 							}
 
-							window.btnStartServer.setText("Server started");
+							window.showMessageDialog("Server started! You can stop the server by closing the window");
 							window.btnStartServer.setEnabled(false);
 							window.textFieldEnterPortNumber.setEnabled(false);
 							window.btnSelectDictFile.setEnabled(false);
@@ -71,7 +71,7 @@ public class DictionaryServer {
 									try {
 										clientSocket = serverSocket.accept();
 									} catch (IOException e) {
-										e.printStackTrace();
+										// e.printStackTrace();
 										return;
 									}
 
@@ -83,6 +83,18 @@ public class DictionaryServer {
 					});
 					window.launch();
 				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+
+		Runtime.getRuntime().addShutdownHook(new Thread() {
+			public void run() {
+				try {
+					ClientHandler.closeAllClientSockets();
+					serverSocket.close();
+					System.out.println("Server stopped");
+				} catch (IOException e) {
 					e.printStackTrace();
 				}
 			}
