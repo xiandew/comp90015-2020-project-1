@@ -156,6 +156,7 @@ public class ClientGUI {
 		panelQueryWordMeaning.add(scrollPaneWordMeaningOutput);
 
 		textAreaWordMeaningOutput = new JTextArea();
+		textAreaWordMeaningOutput.setLineWrap(true);
 		textAreaWordMeaningOutput.setWrapStyleWord(true);
 		scrollPaneWordMeaningOutput.setViewportView(textAreaWordMeaningOutput);
 		textAreaWordMeaningOutput.setEditable(false);
@@ -201,6 +202,7 @@ public class ClientGUI {
 		panelAddNewWord.add(scrollPaneEnterWordDefinition);
 
 		textAreaEnterWordDefinition = new JTextArea();
+		textAreaEnterWordDefinition.setLineWrap(true);
 		textAreaEnterWordDefinition.setWrapStyleWord(true);
 		textAreaEnterWordDefinition.setFont(new Font("Courier New", Font.PLAIN, 15));
 		scrollPaneEnterWordDefinition.setViewportView(textAreaEnterWordDefinition);
@@ -210,6 +212,7 @@ public class ClientGUI {
 		panelAddNewWord.add(scrollPaneAddingNewWordOutput);
 
 		textAreaAddingNewWordOutput = new JTextArea();
+		textAreaAddingNewWordOutput.setLineWrap(true);
 		textAreaAddingNewWordOutput.setWrapStyleWord(true);
 		textAreaAddingNewWordOutput.setFont(new Font("Courier New", Font.PLAIN, 15));
 		scrollPaneAddingNewWordOutput.setViewportView(textAreaAddingNewWordOutput);
@@ -249,6 +252,7 @@ public class ClientGUI {
 		panelRemoveWord.add(scrollPaneRemoveWordOutput);
 
 		textAreaRemoveWordOutput = new JTextArea();
+		textAreaRemoveWordOutput.setLineWrap(true);
 		textAreaRemoveWordOutput.setWrapStyleWord(true);
 		scrollPaneRemoveWordOutput.setViewportView(textAreaRemoveWordOutput);
 		textAreaRemoveWordOutput.setFont(new Font("Courier New", Font.PLAIN, 15));
