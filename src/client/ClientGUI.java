@@ -3,35 +3,36 @@
  */
 package client;
 
+import java.util.HashMap;
+
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+import java.awt.Font;
+import java.awt.BorderLayout;
+
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import java.awt.event.ActionListener;
-import java.net.ConnectException;
-import java.net.Socket;
-import java.net.UnknownHostException;
-import java.util.HashMap;
-import java.awt.event.ActionEvent;
-import javax.swing.JTextArea;
-import java.awt.Font;
 import javax.swing.JRadioButton;
 import javax.swing.JComboBox;
 import javax.swing.JScrollPane;
 import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
 import javax.swing.JMenu;
-import java.awt.BorderLayout;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
+import javax.swing.JTextArea;
+
+import utils.PartOfSpeech;
 
 public class ClientGUI {
 
-	private JPanel panelConnectServer = new JPanel();
-	private JTextField textFieldEnterServerAddr;
-	private JTextField textFieldEnterPortNumber;
+	public JPanel panelConnectServer = new JPanel();
+	public JTextField textFieldEnterServerAddr;
+	public JTextField textFieldEnterPortNumber;
 
 	public JFrame frmDictionaryClient;
 	private JPanel panelWrapper;
@@ -43,6 +44,8 @@ public class ClientGUI {
 	public JTextField textFieldEnterNewWord;
 	public JComboBox<?> comboBoxSelectWordType;
 	public JTextArea textAreaEnterWordDefinition;
+	public JTextArea textAreaAddingNewWordOutput;
+	
 	public JButton btnAddNewWord;
 
 	public JTextField textFieldWordToRemove;
@@ -60,29 +63,8 @@ public class ClientGUI {
 		frmDictionaryClient.setVisible(true);
 	}
 
-	public Socket connect() {
-		Socket socket = null;
-		do {
-			int option = JOptionPane.showConfirmDialog(null, panelConnectServer, "Connect to dictionary server",
-					JOptionPane.OK_CANCEL_OPTION);
-			if (option == JOptionPane.OK_OPTION) {
-				try {
-					socket = new Socket(textFieldEnterServerAddr.getText(),
-							Integer.parseInt(textFieldEnterPortNumber.getText()));
-				} catch (UnknownHostException e) {
-					JOptionPane.showMessageDialog(null, "Make sure that your server address is correct");
-				} catch (NumberFormatException e) {
-					JOptionPane.showMessageDialog(null, "Port number must be numerical");
-				} catch (ConnectException e) {
-					JOptionPane.showMessageDialog(null, "Error: Server error");
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			} else {
-				break;
-			}
-		} while (socket == null);
-		return socket;
+	public void showMessageDialog(String msg) {
+		JOptionPane.showMessageDialog(null, msg);
 	}
 
 	/**
@@ -185,9 +167,14 @@ public class ClientGUI {
 		textAreaWordMeaningOutput.setEditable(false);
 		textAreaWordMeaningOutput.setFont(new Font("Courier New", Font.PLAIN, 15));
 
+		btnAddNewWord = new JButton("Add");
+		btnAddNewWord.setBounds(586, 3, 96, 24);
+		panelQueryWordMeaning.add(btnAddNewWord);
+		btnAddNewWord.setFont(new Font("Courier New", Font.PLAIN, 15));
+
 		JPanel panelAddNewWord = new JPanel();
 		panelAddNewWord.setLayout(null);
-		panelAddNewWord.setBounds(14, 35, 718, 264);
+		panelAddNewWord.setBounds(14, 35, 718, 287);
 		panelWrapper.add(panelAddNewWord);
 
 		JLabel lblEnterNewWord = new JLabel("Enter new word");
@@ -199,11 +186,6 @@ public class ClientGUI {
 		textFieldEnterNewWord.setFont(new Font("Courier New", Font.PLAIN, 15));
 		textFieldEnterNewWord.setBounds(297, 40, 383, 24);
 		panelAddNewWord.add(textFieldEnterNewWord);
-
-		btnAddNewWord = new JButton("Add");
-		btnAddNewWord.setFont(new Font("Courier New", Font.PLAIN, 15));
-		btnAddNewWord.setBounds(584, 229, 96, 24);
-		panelAddNewWord.add(btnAddNewWord);
 
 		JLabel lblAddNewWordTitle = new JLabel("Add a new word");
 		lblAddNewWordTitle.setFont(new Font("Courier New", Font.BOLD, 16));
@@ -220,16 +202,23 @@ public class ClientGUI {
 		lblEnterWordDefinition.setBounds(40, 112, 180, 24);
 		panelAddNewWord.add(lblEnterWordDefinition);
 
-		comboBoxSelectWordType = new JComboBox<Object>();
+		comboBoxSelectWordType = new JComboBox<PartOfSpeech>(PartOfSpeech.values());
 		comboBoxSelectWordType.setBounds(297, 76, 383, 24);
 		panelAddNewWord.add(comboBoxSelectWordType);
 
 		JScrollPane scrollPaneEnterWordDefinition = new JScrollPane();
-		scrollPaneEnterWordDefinition.setBounds(297, 116, 383, 100);
+		scrollPaneEnterWordDefinition.setBounds(297, 116, 383, 58);
 		panelAddNewWord.add(scrollPaneEnterWordDefinition);
 
 		textAreaEnterWordDefinition = new JTextArea();
 		scrollPaneEnterWordDefinition.setViewportView(textAreaEnterWordDefinition);
+		
+		JScrollPane scrollPaneAddingNewWordOutput = new JScrollPane();
+		scrollPaneAddingNewWordOutput.setBounds(37, 187, 643, 58);
+		panelAddNewWord.add(scrollPaneAddingNewWordOutput);
+
+		textAreaAddingNewWordOutput = new JTextArea();
+		scrollPaneAddingNewWordOutput.setViewportView(textAreaAddingNewWordOutput);
 
 		JPanel panelRemoveWord = new JPanel();
 		panelRemoveWord.setBounds(14, 35, 718, 264);
