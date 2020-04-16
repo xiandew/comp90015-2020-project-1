@@ -8,6 +8,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.EOFException;
 import java.io.IOException;
 import java.net.ConnectException;
 import java.net.Socket;
@@ -79,15 +80,23 @@ public class DictionaryClient {
 							switch (type) {
 							case ResponseWordMeaning:
 								window.textAreaWordMeaningOutput.setText((String) response.get("data"));
+								break;
+
 							case ResponseAddingNewWord:
 								window.textAreaAddingNewWordOutput.setText((String) response.get("data"));
+								break;
+
 							case ResponseRemovingWord:
 								window.textAreaRemoveWordOutput.setText((String) response.get("data"));
+								break;
+
 							default:
 								System.out.println("Invalid message type");
 								break;
 							}
 
+						} catch (EOFException e) {
+							break;
 						} catch (IOException e) {
 							e.printStackTrace();
 							break;
@@ -188,8 +197,8 @@ public class DictionaryClient {
 		try {
 			dataOutputStream.writeUTF(msg);
 		} catch (IOException e) {
-			window.showMessageDialog("Error: Unable to send message");
-			e.printStackTrace();
+			// e.printStackTrace();
+			window.showMessageDialog("Error: Unable to send message. Server might be stopped");
 		}
 	}
 
@@ -199,7 +208,7 @@ public class DictionaryClient {
 			return false;
 		}
 
-		if (word.matches("[a-zA-Z]+")) {
+		if (!word.matches("[a-zA-Z]+")) {
 			window.showMessageDialog("The word must be letters only");
 			return false;
 		}
