@@ -8,6 +8,7 @@ import java.io.FileReader;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
+import java.util.TreeSet;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -19,7 +20,7 @@ import utils.PartOfSpeech;
 public class DictionaryController {
 
 	private String dictionaryFilePath;
-	private HashMap<String, HashMap<PartOfSpeech, String>> dictionary;
+	private HashMap<String, HashMap<PartOfSpeech, TreeSet<String>>> dictionary;
 
 	public DictionaryController(String dictionaryFilePath) throws Exception {
 		this.dictionaryFilePath = dictionaryFilePath;
@@ -27,18 +28,24 @@ public class DictionaryController {
 	}
 
 	private void readDictionary(String dictionaryFilePath) throws Exception {
-		this.dictionary = new HashMap<String, HashMap<PartOfSpeech, String>>();
+		this.dictionary = new HashMap<String, HashMap<PartOfSpeech, TreeSet<String>>>();
 
 		try {
 			for (Object wordObject : new JSONArray(new JSONTokener(new FileReader(dictionaryFilePath)))) {
 				JSONObject wordJSONObject = (JSONObject) wordObject;
 				String word = (String) wordJSONObject.get("word");
-				HashMap<PartOfSpeech, String> definitions = new HashMap<>();
+
+				HashMap<PartOfSpeech, TreeSet<String>> definitions = new HashMap<>();
 				for (Object dfnObject : (JSONArray) wordJSONObject.get("definitions")) {
 					JSONObject dfnJSONObject = (JSONObject) dfnObject;
 
-					definitions.put((PartOfSpeech) PartOfSpeech.valueOf((String) dfnJSONObject.get("pos")),
-							(String) dfnJSONObject.get("description"));
+					JSONArray descriptsJSONArray = (JSONArray) dfnJSONObject.get("descriptions");
+					TreeSet<String> descripts = new TreeSet<String>();
+					for (int i = 0; i < descriptsJSONArray.length(); i++) {
+						descripts.add(descriptsJSONArray.getString(i));
+					}
+
+					definitions.put((PartOfSpeech) PartOfSpeech.valueOf((String) dfnJSONObject.get("pos")), descripts);
 				}
 
 				this.dictionary.put(word, definitions);
@@ -58,11 +65,20 @@ public class DictionaryController {
 	public synchronized String queryWordMeaning(String word) {
 		String response;
 
+		word = word.toLowerCase();
+
 		if (this.dictionary.containsKey(word)) {
 			response = "";
-			HashMap<PartOfSpeech, String> meaning = this.dictionary.get(word);
+			HashMap<PartOfSpeech, TreeSet<String>> meaning = this.dictionary.get(word);
 			for (PartOfSpeech pos : meaning.keySet()) {
-				response += String.format("%s%n%8s%s%n%n", pos, "", meaning.get(pos));
+				response += String.format("• %s%n", pos);
+
+				int nDescript = 1;
+				for (String descript : meaning.get(pos)) {
+					response += String.format("%8s[%d] %s%n", "", nDescript++, descript);
+				}
+
+				response += String.format("%n");
 			}
 		} else {
 			response = String.format("Word \"%s\" not found in the dicitonary", word);
@@ -73,32 +89,48 @@ public class DictionaryController {
 
 	public synchronized String addWord(String word, PartOfSpeech pos, String description) {
 		String response;
-		HashMap<PartOfSpeech, String> definitions;
+		HashMap<PartOfSpeech, TreeSet<String>> definitions;
+		TreeSet<String> descripts;
+
+		word = word.toLowerCase();
+
 		if (this.dictionary.containsKey(word)) {
 			definitions = this.dictionary.get(word);
 			if (definitions.containsKey(pos)) {
-				response = String.format("Word \"%s\" of type \"%s\" already exists", word, pos);
+				descripts = definitions.get(pos);
+				if (descripts.add(description)) {
+					response = String.format("New description is added to word \"%s\" of type \"%s\"", word, pos);
+				} else {
+					response = String.format("Word \"%s\" of type \"%s\" with such description already exists", word,
+							pos);
+				}
 			} else {
-				response = String.format("New definition with type \"%s\" is added to word \"%s\"", pos.toString(),
-						word);
+				descripts = new TreeSet<String>();
+				descripts.add(description);
+				response = String.format("New definition with type \"%s\" is added to word \"%s\"", pos, word);
 			}
 		} else {
-			definitions = new HashMap<PartOfSpeech, String>();
-			response = String.format("New word \"%s\" is added to the dictionary", "word");
+			definitions = new HashMap<PartOfSpeech, TreeSet<String>>();
+			descripts = new TreeSet<String>();
+			descripts.add(description);
+			response = String.format("New word \"%s\" is added to the dictionary", word);
 		}
 
-		definitions.put(pos, description);
+		definitions.put(pos, descripts);
 		this.dictionary.put(word, definitions);
 
-		return response;
+		return response + String.format("%n---%n") + this.queryWordMeaning(word);
 	}
 
 	public synchronized String removeWord(String word) {
 		String response;
 
+		word = word.toLowerCase();
+
 		if (this.dictionary.containsKey(word)) {
+			response = String.format("Word \"%s\" is removed from the dictionary%n---%n%s", word,
+					this.queryWordMeaning(word));
 			this.dictionary.remove(word);
-			response = String.format("Word \"%s\" is removed from the dictionary", word);
 		} else {
 			response = String.format("Word \"%s\" not found in the dicitonary", word);
 		}
@@ -112,11 +144,17 @@ public class DictionaryController {
 			JSONObject wordJSONObject = new JSONObject();
 			wordJSONObject.put("word", word);
 			JSONArray dfnJSONObjects = new JSONArray();
-			HashMap<PartOfSpeech, String> definitions = this.dictionary.get(word);
+			HashMap<PartOfSpeech, TreeSet<String>> definitions = this.dictionary.get(word);
 			for (PartOfSpeech pos : definitions.keySet()) {
 				JSONObject dfnJSONObject = new JSONObject();
 				dfnJSONObject.put("pos", pos.name());
-				dfnJSONObject.put("description", definitions.get(pos));
+
+				JSONArray descriptsJSONArray = new JSONArray();
+				for (String descript : definitions.get(pos)) {
+					descriptsJSONArray.put(descript);
+				}
+
+				dfnJSONObject.put("descriptions", descriptsJSONArray);
 				dfnJSONObjects.put(dfnJSONObject);
 			}
 			wordJSONObject.put("definitions", dfnJSONObjects);
