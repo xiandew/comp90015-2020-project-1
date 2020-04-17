@@ -1,3 +1,6 @@
+/**
+ * @author Xiande Wen (905003)
+ */
 package server;
 
 import javax.swing.JFileChooser;
