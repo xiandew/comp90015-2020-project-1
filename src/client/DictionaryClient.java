@@ -102,7 +102,7 @@ public class DictionaryClient {
 						} catch (EOFException e) {
 							break;
 						} catch (IOException e) {
-							e.printStackTrace();
+							// e.printStackTrace();
 							break;
 						}
 					}
@@ -110,6 +110,17 @@ public class DictionaryClient {
 
 				// Launch the main panel
 				window.launch();
+			}
+		});
+		
+		Runtime.getRuntime().addShutdownHook(new Thread() {
+			public void run() {
+				try {
+					socket.close();
+					System.out.println("Socket closed");
+				} catch (Exception e) {
+					// e.printStackTrace();
+				}
 			}
 		});
 	}
