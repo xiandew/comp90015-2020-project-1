@@ -31,7 +31,13 @@ public class DictionaryController {
 		this.dictionary = new HashMap<String, HashMap<PartOfSpeech, TreeSet<String>>>();
 
 		try {
-			for (Object wordObject : new JSONArray(new JSONTokener(new FileReader(dictionaryFilePath)))) {
+			JSONTokener wordObjectsJSONTokener = new JSONTokener(new FileReader(dictionaryFilePath));
+
+			if (!wordObjectsJSONTokener.more()) {
+				return;
+			}
+
+			for (Object wordObject : new JSONArray(wordObjectsJSONTokener)) {
 				JSONObject wordJSONObject = (JSONObject) wordObject;
 				String word = (String) wordJSONObject.get("word");
 
@@ -55,7 +61,7 @@ public class DictionaryController {
 		} catch (FileNotFoundException e) {
 			throw new Exception(String.format("Error: Dictionary file \"%s\" not found", dictionaryFilePath));
 		} catch (JSONException e) {
-			e.printStackTrace();
+			// e.printStackTrace();
 			throw new Exception("Error: Parse error when parsing the dictionary file");
 		} catch (Exception e) {
 			e.printStackTrace();
