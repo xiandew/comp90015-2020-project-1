@@ -17,7 +17,7 @@ import javax.net.ServerSocketFactory;
 
 public class DictionaryServer {
 
-	private ServerSocket serverSocket;
+	private ServerSocket serverSocket = null;
 	private ServerGUI window;
 
 	/**
@@ -30,8 +30,7 @@ public class DictionaryServer {
 	public DictionaryServer() {
 		// Setup thread pool
 		DynamicBlockingQueue<Runnable> queue = new DynamicBlockingQueue<Runnable>();
-		// TODO TEST
-		int maxPoolSize = 1;
+		int maxPoolSize = 40;
 		ThreadPoolExecutor executor = new ThreadPoolExecutor(0, maxPoolSize, 60, TimeUnit.SECONDS, queue);
 		queue.setThreadPoolExecutor(executor);
 
@@ -93,13 +92,15 @@ public class DictionaryServer {
 				try {
 					// Close all client sockets
 					ClientHandler.closeAllClientSockets();
+
 					// Close server socket
 					serverSocket.close();
 					System.out.println("Server socket closed. Server stopped");
+
 					// Save dictionary onto disk
 					ClientHandler.saveDictionaryToDisk();
-				} catch (IOException e) {
-					e.printStackTrace();
+				} catch (Exception e) {
+					// e.printStackTrace();
 				}
 			}
 		});

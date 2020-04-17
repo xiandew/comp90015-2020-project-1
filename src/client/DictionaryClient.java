@@ -65,7 +65,7 @@ public class DictionaryClient {
 					dataInputStream = new DataInputStream(socket.getInputStream());
 					dataOutputStream = new DataOutputStream(socket.getOutputStream());
 				} catch (Exception e) {
-					e.printStackTrace();
+					// e.printStackTrace();
 					return;
 				}
 
