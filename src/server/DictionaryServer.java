@@ -42,6 +42,9 @@ public class DictionaryServer {
 						public void actionPerformed(ActionEvent arg0) {
 							ServerSocketFactory factory = ServerSocketFactory.getDefault();
 							try {
+								if (serverSocket != null) {
+									serverSocket.close();
+								}
 								serverSocket = factory.createServerSocket(
 										Integer.parseInt(window.textFieldEnterPortNumber.getText()));
 								ClientHandler.setupDictionaryController(window.selectedDictionaryFilePath);

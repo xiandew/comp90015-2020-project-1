@@ -43,7 +43,7 @@ public class ClientHandler implements Runnable {
 			throw e;
 		}
 	}
-	
+
 	public static void saveDictionaryToDisk() {
 		ClientHandler.dictionaryController.saveToDisk();
 	}
@@ -101,7 +101,7 @@ public class ClientHandler implements Runnable {
 				response.put("type", MessageType.ResponseAddingNewWord.toString());
 
 				JSONObject newWord = new JSONObject(request.get("data").toString());
-				
+
 				String word = (String) newWord.get("word");
 				PartOfSpeech wordType = PartOfSpeech.valueOf((String) newWord.get("wordType"));
 				String description = (String) newWord.get("description");
